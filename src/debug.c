@@ -18,6 +18,21 @@ static int constantInstruction(const char *name, Chunk *chunk,
     return offset + 2;
 }
 
+static int constantLongInstruction(const char *name, Chunk *chunk,
+                                   int offset)
+{
+    // There's got to be a better way to read a 24 bit value out of a
+    // 8 bit array...
+    uint32_t highByte = chunk->code[offset + 1];
+    uint32_t middleByte = chunk->code[offset + 2];
+    uint32_t lowByte = chunk->code[offset + 3];
+    uint32_t constant = (highByte << 16) + (middleByte << 8) + lowByte;
+    printf("%-16s %4d '", name, constant);
+    printValue(chunk->constants.values[constant]);
+    printf("'\n");
+    return offset + 4;
+}
+
 void disassembleChunk(Chunk *chunk, const char *name)
 {
     printf("== %s ==\n", name);
@@ -49,6 +64,8 @@ int disassembleInstruction(Chunk *chunk, int offset)
         return simpleInstruction("OP_RETURN", offset);
     case OP_CONSTANT:
         return constantInstruction("OP_CONSTANT", chunk, offset);
+    case OP_CONSTANT_LONG:
+        return constantLongInstruction("OP_CONSTANT_LONG", chunk, offset);
     default:
         printf("Unknown opcode %d\n", instruction);
         return offset + 1;
