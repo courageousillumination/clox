@@ -28,6 +28,26 @@ void writeChunk(Chunk *chunk, uint8_t byte, int line)
     chunk->count++;
 }
 
+void writeChunk32(Chunk *chunk, uint32_t bytes, int line)
+{
+    if (chunk->capacity < chunk->count + 4)
+    {
+        int oldCapacity = chunk->capacity;
+        chunk->capacity = GROW_CAPACITY(oldCapacity);
+        chunk->code = GROW_ARRAY(uint8_t, chunk->code,
+                                 oldCapacity, chunk->capacity);
+        chunk->lines = GROW_ARRAY(int, chunk->lines,
+                                  oldCapacity, chunk->capacity);
+    }
+
+    *(uint32_t *)(&(chunk->code[chunk->count])) = bytes;
+    chunk->lines[chunk->count] = line;
+    chunk->lines[chunk->count + 1] = line;
+    chunk->lines[chunk->count + 2] = line;
+    chunk->lines[chunk->count + 3] = line;
+    chunk->count += 4;
+}
+
 void freeChunk(Chunk *chunk)
 {
     FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
@@ -48,9 +68,7 @@ void writeConstant(Chunk *chunk, Value value, int line)
     if (constant > 255)
     {
         writeChunk(chunk, OP_CONSTANT_LONG, line);
-        writeChunk(chunk, constant >> 16, line);
-        writeChunk(chunk, constant >> 8, line);
-        writeChunk(chunk, constant, line);
+        writeChunk32(chunk, constant, line);
     }
     else
     {

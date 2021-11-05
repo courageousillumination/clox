@@ -1,23 +1,26 @@
 #include "common.h"
 #include "chunk.h"
 #include "debug.h"
+#include "vm.h"
 
 int main()
 {
+    initVM();
     Chunk chunk;
     initChunk(&chunk);
-    writeChunk(&chunk, OP_RETURN, 1);
-
+    // Fill up the constants array to send us to long constant.
     for (int i = 0; i < 300; i++)
     {
-        writeConstant(&chunk, i, 1);
-        // int constant = addConstant(&chunk, i * 2);
-        // writeChunk(&chunk, OP_CONSTANT, 1);
-        // writeChunk(&chunk, constant, 1);
+        addConstant(&chunk, i);
     }
 
-    disassembleChunk(&chunk, "test chunk");
+    writeConstant(&chunk, 555, 1);
+    writeChunk(&chunk, OP_NEGATE, 1);
+    writeChunk(&chunk, OP_RETURN, 1);
+
+    interpret(&chunk);
 
     freeChunk(&chunk);
+    freeVM();
     return 0;
 }
