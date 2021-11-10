@@ -19,6 +19,17 @@ typedef enum
     OP_SUBTRACT,
     OP_MULTIPLY,
     OP_DIVIDE,
+
+    // Other constants
+    OP_NIL,
+    OP_TRUE,
+    OP_FALSE,
+
+    // Boolean operators
+    OP_NOT,
+    OP_EQUAL,
+    OP_GREATER,
+    OP_LESS,
 } OpCode;
 
 typedef struct
