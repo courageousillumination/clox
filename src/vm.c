@@ -185,11 +185,13 @@ void initVM()
 {
     vm.ip = NULL;
     vm.objects = NULL;
+    initTable(&vm.strings);
     resetStack();
 }
 
 void freeVM()
 {
+    freeTable(&vm.strings);
     freeObjects();
 }
 
